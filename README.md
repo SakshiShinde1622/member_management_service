@@ -64,7 +64,7 @@ src/
 | `registrationDate`| DATE     | Member's onboarding date     |
 
 ---
-##  Architecture Diagram
+##  Module Architecture Diagram 
 
 ```mermaid
 flowchart LR
@@ -184,8 +184,11 @@ sequenceDiagram
 | PUT    | `/api/members/{id}/status`        | Update membership status |
 | DELETE | `/api/members/{id}`               | Delete member            |
 
----
 
+Swagger Url : http://localhost:8081/swagger-ui/index.html#/
+
+---
+Eureka Discovery : http://localhost:8761/
 ##  Run Locally
 
 ```bash
