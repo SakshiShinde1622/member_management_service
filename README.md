@@ -1,6 +1,6 @@
 #  Member Service
 
-The Member Management Service is a standalone Spring Boot microservice responsible for handling member registration, profile updates, and managing the membership lifecycle in a Library Management System. It is designed for modularity, scalability, and integration within a microservices ecosystem via Eureka Discovery and Spring Cloud Gateway.
+- The Member Management Service is a standalone Spring Boot microservice responsible for handling member registration, profile updates, and managing the membership lifecycle in a Library Management System. It is designed for modularity, scalability, and integration within a microservices ecosystem via Eureka Discovery and Spring Cloud Gateway.
 ---
 ##  Features
 
@@ -22,20 +22,20 @@ The Member Management Service is a standalone Spring Boot microservice responsib
 - Eureka Discovery Client
 
 ---
-**## Folder Structure**
-
+## Folder Structure
+<pre>
 src/
 └── main/
     ├── java/
     │   └── com.library.member/
-    │       ├── controller/
-    │       ├── dto/
-    │       ├── entity/
-    │       ├── repository/
-    │       └── service/
+    │       ├── controller/       # REST controllers
+    │       ├── dto/              # Data Transfer Objects
+    │       ├── entity/           # JPA Entities
+    │       ├── repository/       # Spring Data Repositories
+    │       └── service/          # Business logic layer
     └── resources/
-        └── application.properties
-
+        └── application.properties  # App configuration
+</pre>
 ---
 
 ##  REST API Endpoints
@@ -68,25 +68,25 @@ src/
 
 ```mermaid
 flowchart LR
-  A[/api/books/] --> B[BookController]
-  B --> C[BookService]
-  C --> D[BookRepository]
+  A[/api/members/] --> B[MemberController]
+  B --> C[MemberService]
+  C --> D[MemberRepository]
   D --> E[(member_db<br>MySQL)]
   C --> F[Eureka Discovery Server]
 
-  %% Styling
-  classDef api fill:#add8e6,color:#000
-  classDef controller fill:#f08080,color:#000
-  classDef service fill:#fdfd96,color:#000
-  classDef repo fill:#90ee90,color:#000
-  classDef db fill:#dda0dd,color:#000
-  classDef registry fill:#d3d3d3,color:#000
+  %% Color Scheme Styling
+  classDef endpoint fill:#cce5ff,stroke:#339af0,color:#003566
+  classDef controller fill:#ffe8cc,stroke:#ff922b,color:#7f4f24
+  classDef service fill:#d3f9d8,stroke:#51cf66,color:#1b4332
+  classDef repository fill:#e0f7fa,stroke:#00bcd4,color:#006064
+  classDef database fill:#e6e6fa,stroke:#b39ddb,color:#4a148c
+  classDef registry fill:#f1f3f5,stroke:#868e96,color:#343a40
 
-  class A api
+  class A endpoint
   class B controller
   class C service
-  class D repo
-  class E db
+  class D repository
+  class E database
   class F registry
 ```
 
@@ -100,19 +100,75 @@ _This diagram illustrates the layered architecture:_
 - The service is registered with Eureka for discovery
 
 ## Component Diagram
-<img width="539" alt="component" src="https://github.com/user-attachments/assets/e18b87cb-4ab1-4741-b166-ea01f02df50a" />
+```mermaid
+flowchart LR
 
+  %% Groups
+  subgraph Frontend [React Frontend]
+    direction TB
+    A1[Member UI Components]
+    A2[Member API Client]
+  end
 
-## Class Diagram
-<img width="494" alt="class" src="https://github.com/user-attachments/assets/5fa6a341-ba07-4ce9-8935-19122148659e" />
+  subgraph Backend [Spring Boot]
+    direction TB
+    B1[MemberController]
+    B2[MemberService]
+    B3[MemberRepository]
+  end
 
-## Flow Diagram
-<img width="639" alt="d1" src="https://github.com/user-attachments/assets/b8e652ec-94b9-4202-9c79-a02dab0675bc" />
+  subgraph Database [Relational Database]
+    direction TB
+    C1[(Members Table)]
+  end
 
-## Database schema
-<img width="585" alt="d2" src="https://github.com/user-attachments/assets/e026aa8c-14b2-48a4-b1ef-26b907951b00" />
+  %% Entity and DTO
+  D1[Member DTO]
+  D2[Member Entity]
 
----
+  %% Connections
+  A2 -->|HTTP/REST| B1
+  B1 -->|Calls| B2
+  B2 -->|Calls| B3
+  B3 -->|ORM / JDBC| C1
+
+  B1 ---|uses| D1
+  B3 ---|maps to| D2
+
+  %% Styling
+  classDef frontend fill:#dae8fc,stroke:#6c8ebf,color:#1a237e
+  classDef backend fill:#d5e8d4,stroke:#82b366,color:#1b4332
+  classDef storage fill:#e8def8,stroke:#8e44ad,color:#4a148c
+  classDef model fill:#fff2cc,stroke:#d6b656,color:#7f4f24
+
+  class A1,A2 frontend
+  class B1,B2,B3 backend
+  class C1 storage
+  class D1,D2 model
+```
+
+## Sequence  Diagram
+```mermaid
+sequenceDiagram
+  actor UI as React Frontend
+  participant C as MemberController
+  participant S as MemberService
+  participant R as MemberRepository
+  participant DB as Database
+
+  UI->>C: HTTP POST /api/members (MemberDto)
+  C->>S: registerMember(memberDto)
+  S->>R: save(memberEntity)
+  R->>DB: INSERT INTO Members
+  R-->>S: Return Saved Member
+  S-->>C: Return MemberDto
+  C-->>UI: 201 Created (MemberDto)
+
+  %% Styling (as comments for Mermaid, no visual impact)
+  %% UI:       #dae8fc (soft blue)
+  %% Controller/Service/Repo: #d5e8d4 (light green)
+  %% DB:       #f3e5f5 (lavender)
+```
 
 ##  API Endpoints
 
